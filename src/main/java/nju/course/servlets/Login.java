@@ -1,5 +1,8 @@
 package nju.course.servlets;
 
+import nju.course.factory.ModelFactory;
+import nju.course.model.AuthModel;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
@@ -20,19 +23,11 @@ import java.util.Properties;
 @WebServlet(name = "login", urlPatterns = "/login", loadOnStartup = 1)
 public class Login extends HttpServlet {
 
-    private DataSource dataSource = null;
+    private AuthModel authModel = null;
 
     @Override
     public void init() throws ServletException {
-        Properties properties = new Properties();
-        properties.put(javax.naming.Context.PROVIDER_URL, "jnp:///");
-        properties.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
-        try {
-            InitialContext context = new InitialContext();
-            dataSource = (DataSource) context.lookup("java:comp/env/jdbc/course");
-        } catch (NamingException e) {
-            e.printStackTrace();
-        }
+        authModel = ModelFactory.getAuthModel();
         this.getServletContext().setAttribute("userCount", 0);
         this.getServletContext().setAttribute("loginedCount", 0);
     }
@@ -50,34 +45,21 @@ public class Login extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String name = (String) req.getParameter("username");
+        String username = (String) req.getParameter("username");
         String password = (String) req.getParameter("password");
+        Integer user_id = authModel.login(username, password);
 
-        String sql = "SELECT id FROM student WHERE name = ? AND password = ? LIMIT 1 ";
-        //use try with resources
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql))
-        {
-            statement.setString(1, name);
-            statement.setString(2, password);
-            try (ResultSet result = statement.executeQuery()) {
-                if (result.next()){
-                    int student_id = result.getInt("id");
-                    HttpSession session = req.getSession();
-                    session.setAttribute("student_id", student_id);
-                    ServletContext application = session.getServletContext();
-                    application.setAttribute("loginedCount", (Integer)application.getAttribute("loginedCount") +1);
-                    resp.sendRedirect("/home");
-                }
-                else {          //login fail
-                    req.setAttribute("last_name", name);
-                    req.setAttribute("login_failed", true);
-                    req.getRequestDispatcher("/WEB-INF/jsp/view/login.jsp").forward(req, resp);
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (user_id == null) {      //username or password error
+            req.setAttribute("last_name", username);
+            req.setAttribute("login_failed", true);
+            req.getRequestDispatcher("/WEB-INF/jsp/view/login.jsp").forward(req, resp);
+        }
+        else {
+            HttpSession session = req.getSession();
+            session.setAttribute("student_id", user_id);
+            ServletContext application = session.getServletContext();
+            application.setAttribute("loginedCount", (Integer)application.getAttribute("loginedCount") +1);
+            resp.sendRedirect("/home");
         }
     }
 }

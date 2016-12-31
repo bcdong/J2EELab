@@ -1,5 +1,9 @@
 package nju.course.servlets;
 
+import nju.course.factory.ModelFactory;
+import nju.course.model.HomeModel;
+import nju.course.model.impl.HomeModelImpl;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
@@ -15,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -23,19 +28,11 @@ import java.util.Properties;
 @WebServlet(name = "home", urlPatterns = "/home", loadOnStartup = 1)
 public class Home extends HttpServlet {
 
-    private DataSource dataSource = null;
+    private HomeModel homeModel = null;
 
     @Override
     public void init() throws ServletException {
-        Properties properties = new Properties();
-        properties.put(javax.naming.Context.PROVIDER_URL, "jnp:///");
-        properties.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
-        try {
-            InitialContext context = new InitialContext();
-            dataSource = (DataSource) context.lookup("java:comp/env/jdbc/course");
-        } catch (NamingException e) {
-            e.printStackTrace();
-        }
+        homeModel = ModelFactory.getHomeModel();
     }
 
     @Override
@@ -46,45 +43,7 @@ public class Home extends HttpServlet {
         }
         else {
             int student_id = (Integer) session.getAttribute("student_id");
-            String username = "";
-            ArrayList<String> courseList = new ArrayList<String>();
-            ArrayList<String> absentExamList = new ArrayList<String>();
-
-            String sql1 = "SELECT name FROM student WHERE id = ? ";
-            String sql2 = "SELECT course.name FROM major, course WHERE major.student_id = ? AND major.course_id = course.id ";
-            String sql3 = "SELECT exam_name FROM exam WHERE exam.course_id IN (SELECT major.course_id FROM major WHERE major.student_id = ? ) AND exam.id NOT IN (SELECT t1.exam_id FROM exam_score t1 WHERE t1.student_id = ? AND t1.score IS NOT NULL )";
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement nameMajorStatement = conn.prepareStatement(sql1);
-                 PreparedStatement majorStatement = conn.prepareStatement(sql2);
-                 PreparedStatement checkStatement = conn.prepareStatement(sql3))
-            {
-                nameMajorStatement.setInt(1, student_id);
-                majorStatement.setInt(1, student_id);
-                checkStatement.setInt(1, student_id);
-                checkStatement.setInt(2, student_id);
-
-                try (ResultSet result1 = nameMajorStatement.executeQuery();
-                     ResultSet result2 = majorStatement.executeQuery();
-                     ResultSet result3 = checkStatement.executeQuery())
-                {
-                    if (result1.next()){
-                        username = result1.getString("name");
-                    }
-                    else {}
-                    while (result2.next()) {
-                        courseList.add(result2.getString("name"));
-                    }
-                    while (result3.next()) {
-                        absentExamList.add(result3.getString("exam_name"));
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            req.setAttribute("username", username);
-            req.setAttribute("courseList", courseList);
-            req.setAttribute("absentExamList", absentExamList);
+            homeModel.getBasicInfo(student_id, req, resp);
             req.getRequestDispatcher("/WEB-INF/jsp/view/home.jsp").forward(req, resp);
         }
     }
