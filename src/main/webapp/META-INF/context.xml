@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Context path="/">
-    <Resource name="jdbc/course" auth="Container" type="javax.sql.DataSource"
-        maxActive="50" maxIdle="30" maxWait="10000" logAbandoned="true"
-        username="harry" password="Temp_Pass" driverClassName="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://localhost:3306/course?autoReconnect=true&amp;useSSL=false&amp;" />
-</Context>

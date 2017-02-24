@@ -38,8 +38,6 @@ public class Home extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
-        //TODO rollback to use the commented method, do not use MyTag!!! Delete <MyTag:checkSession/> in home.jsp
-        /*
         if (session.getAttribute("student_id") == null) {
             req.getRequestDispatcher("/WEB-INF/jsp/view/guestHome.jsp").forward(req, resp);
         }
@@ -48,7 +46,6 @@ public class Home extends HttpServlet {
             homeModel.getBasicInfo(student_id, req, resp);
             req.getRequestDispatcher("/WEB-INF/jsp/view/home.jsp").forward(req, resp);
         }
-        */
         req.getRequestDispatcher("/WEB-INF/jsp/view/home.jsp").forward(req, resp);
     }
 
