@@ -2,31 +2,27 @@ package nju.course.model.impl;
 
 import nju.course.dao.ExamDao;
 import nju.course.dao.StudentInfoDao;
-import nju.course.factory.DaoFactory;
 import nju.course.model.HomeModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Mr.Zero on 2016/12/31.
  */
+@Service
 public class HomeModelImpl implements HomeModel {
 
-    private static HomeModelImpl ourInstance = new HomeModelImpl();
+    @Autowired
+    private StudentInfoDao studentInfoDao;
 
-    public static HomeModelImpl getInstance() {
-        return ourInstance;
-    }
-
-    private StudentInfoDao studentInfoDao = null;
+    @Autowired
     private ExamDao examDao = null;
 
-    private HomeModelImpl() {
-        studentInfoDao = DaoFactory.getStudentInfoDao();
-        examDao = DaoFactory.getExamDao();
+    public HomeModelImpl() {
     }
 
     @Override

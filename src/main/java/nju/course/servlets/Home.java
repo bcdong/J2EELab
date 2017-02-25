@@ -1,26 +1,17 @@
 package nju.course.servlets;
 
-import nju.course.factory.ModelFactory;
 import nju.course.model.HomeModel;
-import nju.course.model.impl.HomeModelImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Properties;
 
 /**
  * Created by Mr.Zero on 2016/12/20.
@@ -28,11 +19,13 @@ import java.util.Properties;
 @WebServlet(name = "home", urlPatterns = "/home", loadOnStartup = 1)
 public class Home extends HttpServlet {
 
-    private HomeModel homeModel = null;
+    private HomeModel homeModel;
 
     @Override
     public void init() throws ServletException {
-        homeModel = ModelFactory.getHomeModel();
+        super.init();
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring-config.xml");
+        this.homeModel = (HomeModel) applicationContext.getBean("homeModel");
     }
 
     @Override

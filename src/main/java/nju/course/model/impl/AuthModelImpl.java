@@ -1,23 +1,20 @@
 package nju.course.model.impl;
 
 import nju.course.dao.AuthDao;
-import nju.course.factory.DaoFactory;
 import nju.course.model.AuthModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Created by Mr.Zero on 2016/12/31.
  */
+@Service
 public class AuthModelImpl implements AuthModel {
-    private static AuthModelImpl ourInstance = new AuthModelImpl();
 
-    public static AuthModelImpl getInstance() {
-        return ourInstance;
-    }
-
+    @Autowired
     private AuthDao authDao = null;
 
-    private AuthModelImpl() {
-        authDao = DaoFactory.getAuthDao();
+    public AuthModelImpl() {
     }
 
     @Override

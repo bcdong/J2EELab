@@ -1,10 +1,11 @@
 package nju.course.dao.impl;
 
 import nju.course.dao.ExamDao;
-import nju.course.factory.HibernateSessionFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,17 +13,13 @@ import java.util.List;
 /**
  * Created by Mr.Zero on 2016/12/30.
  */
+@Repository
 public class ExamDaoImpl implements ExamDao {
-    private static ExamDaoImpl ourInstance = new ExamDaoImpl();
 
-    public static ExamDaoImpl getInstance() {
-        return ourInstance;
-    }
+    @Autowired
+    private SessionFactory sessionFactory;
 
-    private SessionFactory sessionFactory = null;
-
-    private ExamDaoImpl() {
-        this.sessionFactory = HibernateSessionFactory.getSessionFactory();
+    public ExamDaoImpl() {
     }
 
     @Override

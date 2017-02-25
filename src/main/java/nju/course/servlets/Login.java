@@ -1,10 +1,9 @@
 package nju.course.servlets;
 
-import nju.course.factory.ModelFactory;
 import nju.course.model.AuthModel;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,10 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.*;
-import java.util.Properties;
 
 /**
  * Created by Mr.Zero on 2016/12/13.
@@ -23,11 +19,13 @@ import java.util.Properties;
 @WebServlet(name = "login", urlPatterns = "/login", loadOnStartup = 1)
 public class Login extends HttpServlet {
 
-    private AuthModel authModel = null;
+    private AuthModel authModel;
 
     @Override
     public void init() throws ServletException {
-        authModel = ModelFactory.getAuthModel();
+        super.init();
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring-config.xml");
+        this.authModel = (AuthModel) applicationContext.getBean("authModel");
         this.getServletContext().setAttribute("userCount", 0);
         this.getServletContext().setAttribute("loginedCount", 0);
     }
@@ -45,8 +43,8 @@ public class Login extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String username = (String) req.getParameter("username");
-        String password = (String) req.getParameter("password");
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
         Integer user_id = authModel.login(username, password);
 
         if (user_id == null) {      //username or password error

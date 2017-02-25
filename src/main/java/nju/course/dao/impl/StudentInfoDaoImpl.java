@@ -1,10 +1,11 @@
 package nju.course.dao.impl;
 
 import nju.course.dao.StudentInfoDao;
-import nju.course.factory.HibernateSessionFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,17 +13,13 @@ import java.util.List;
 /**
  * Created by Mr.Zero on 2016/12/30.
  */
+@Repository
 public class StudentInfoDaoImpl implements StudentInfoDao {
-    private static StudentInfoDaoImpl ourInstance = new StudentInfoDaoImpl();
 
-    public static StudentInfoDaoImpl getInstance() {
-        return ourInstance;
-    }
+    @Autowired
+    private SessionFactory sessionFactory;
 
-    private SessionFactory sessionFactory = null;
-
-    private StudentInfoDaoImpl() {
-        this.sessionFactory = HibernateSessionFactory.getSessionFactory();
+    public StudentInfoDaoImpl() {
     }
 
 

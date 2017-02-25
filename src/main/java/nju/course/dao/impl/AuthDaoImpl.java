@@ -1,27 +1,24 @@
 package nju.course.dao.impl;
 
 import nju.course.dao.AuthDao;
-import nju.course.factory.HibernateSessionFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by Mr.Zero on 2016/12/30.
  */
+@Repository
 public class AuthDaoImpl implements AuthDao {
-    private static AuthDaoImpl ourInstance = new AuthDaoImpl();
 
-    public static AuthDaoImpl getInstance() {
-        return ourInstance;
-    }
+    @Autowired
+    private SessionFactory sessionFactory;
 
-    private SessionFactory sessionFactory = null;
-
-    private AuthDaoImpl() {
-        this.sessionFactory = HibernateSessionFactory.getSessionFactory();
+    public AuthDaoImpl() {
     }
 
     @Override
